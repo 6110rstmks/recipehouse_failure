@@ -3,7 +3,11 @@ import { defineProps, onMounted, ref, watch} from "vue"
 import { useRoute } from 'vue-router'
 
 import { useStoreFlagger } from '../stores/flagger.js'
+import { useDataSense } from '../stores/dataSense.js'
+
+
 const flagger = useStoreFlagger()
+const dataSense = useDataSense()
 
 const route = useRoute()
 
@@ -16,6 +20,8 @@ const category = ref({})
 const recipes = ref([])
 
 const newRecipe = ref('')
+
+const noData = ref(false)
 
 let categoryId = parseInt(route.params.categoryId)
 
@@ -43,8 +49,6 @@ const getRecipes = () => {
     axios.get('/api/categories/' + categoryId + '/recipes/')
         .then((res) => {
             recipes.value = res.data
-            console.log(recipes.value)
-
         })
 }
 
@@ -57,12 +61,6 @@ const submitNewRecipe = () => {
 onMounted(() => {
     getCategory()
     getRecipes()
-
-    let flagData = ref(flagger.flag)
-
-    watch(flagData, () => {
-        getMaxIdCategory()
-    })
 })
 
 watch(route, () => {
@@ -71,24 +69,31 @@ watch(route, () => {
     getRecipes()
 })
 
-// 個別ページと同じカテゴリが削除されたのを感知してidが最大のページを取得する
+// ２つの役割
+// ①個別ページと同じカテゴリが削除されたのを感知してidが最大のページを取得して表示する
+// ②左ページでカテゴリが追加されたのを感知して右ページにそのカテゴリを取得して表示させる
+
 flagger.$subscribe((mutation,state) => {
     getMaxIdCategory()
 })
 
+dataSense.$subscribe((mutation, state) => {
+    noData.value = true
+})
 
 </script>
 
 <template>
-        <span class="icon">
-            <i class="fas fa-utensils fa-lg"></i>
-        </span>
-        <div>{{ category.title }}</div>
-        <form method="post" v-on:submit.prevent="addRecipe">
-            <input type="text" v-model="newRecipe">
-        </form>
-        <ul style="margin-top: 15px;">
-            <li v-for="recipe in recipes">{{ recipe.title }}</li>
-        </ul>
+    <span class="icon">
+        <i class="fas fa-utensils fa-lg"></i>
+    </span>
+    <div>{{ category.title }}</div>
+    <form method="post" v-on:submit.prevent="addRecipe">
+        <input type="text" v-model="newRecipe">
+    </form>
 
+    <li v-if="noData">No data</li>
+    <ul style="margin-top: 15px;" v-if="!noData">
+        <li v-for="recipe in recipes">{{ recipe.title }}</li>
+    </ul>
 </template>

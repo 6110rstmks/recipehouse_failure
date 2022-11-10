@@ -2,22 +2,30 @@
 
 import { ref, onMounted } from "vue"
 
+import { useStoreFlagger } from '../stores/flagger.js'
+
+const flagger = useStoreFlagger()
+
 const category = ref({})
 const newRecipe = ref('')
 const recipes = ref([])
 
-let categoryId = ref('')
-
 const addRecipe = () => {
     submitNewRecipe()
-    console.log('lo')
     getRecipes()
     newRecipe.value = ''
 }
 
+const submitNewRecipe = () => {
+    let categoryId = category.value.id
+    axios.post('/api/categories/' + categoryId + '/recipes/store', {
+        title: newRecipe.value
+    })
+}
+
 const getRecipes = () => {
-    console.log('toru')
-    console.log(category.value.id)
+    let categoryId = category.value.id
+
     axios.get('/api/categories/' + categoryId + '/recipes/')
         .then((res) => {
             console.log(res.data)
@@ -25,28 +33,32 @@ const getRecipes = () => {
     })
 }
 
-const submitNewRecipe = () => {
-    axios.post('/api/categories/' + categoryId + '/recipes/store', {
-        title: newRecipe.value
-    })
+const getMaxIdCategory = async () => {
+    const maxRes = await axios.get('/api/max')
+    category.value = maxRes.data
 }
 
-const getMaxCategory = () => {
-    axios.get('/api/max')
+const onMountedGetRecipes = async () => {
+    const maxRes = await axios.get('/api/max')
+    category.value = maxRes.data
+    let categoryId = category.value.id
+    axios.get('/api/categories/' + categoryId + '/recipes/')
         .then((res) => {
-        category.value = res.data
-        console.log(category.value.id)
+            recipes.value = res.data
     })
 }
 
 onMounted(() => {
-    getMaxCategory()
-    getRecipes()
+    onMountedGetRecipes()
 })
+
+flagger.$subscribe((mutation,state) => {
+    getMaxIdCategory()
+})
+
 </script>
 
 <template>
-
     <!-- <div>{{ category && category[0] ? category[0].title : '' }}</div>] -->
     <span class="icon">
             <i class="fas fa-utensils fa-lg"></i>

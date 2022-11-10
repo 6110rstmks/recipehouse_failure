@@ -1,87 +1,85 @@
 <script setup>
-    import { ref, onMounted, watch } from "vue"
-    import { useRoute } from 'vue-router'
+import { ref, onMounted, watch } from "vue"
+import { useRoute, useRouter} from 'vue-router'
 
-    import { useStoreFlagger } from '../stores/flagger.js';
-    const flagger = useStoreFlagger();
+import { useStoreFlagger } from '../stores/flagger.js'
+import { useDataSense } from '../stores/dataSense.js'
 
+const flagger = useStoreFlagger()
 
-    const route = useRoute()
+const dataSense = useDataSense()
 
-    const newCategory = ref('')
-
-    const categories = ref([])
-
-    let currentCategoryId = ref('')
-
-    let currentUrl = ref('')
+const route = useRoute()
 
 
-    const submitNewCategory = () => {
-        axios.post('/api/categories/store', {
-            title: newCategory.value
-        })
-    }
+const newCategory = ref('')
 
-    const getCurrentCategoryId = () => {
+const categories = ref([])
 
-    // window.location.href returns the href (URL) of the current page ·
-        // currentUrl = ref(window.location.href)
-        currentUrl = ref(window.location.href)
-        currentCategoryId = ref(currentUrl.value.replace('http://localhost:8000/categories/', ''))
-    }
+let currentCategoryId = ref('')
 
-    const addCategory = () => {
-        submitNewCategory()
-        getCategories()
-        newCategory.value = ''
-    }
+let currentUrl = ref('')
 
-    const getCategories = () => {
-        axios.get('/api/categories')
-            .then((res) => {
-            categories.value = res.data
-        })
-    }
+const submitNewCategory = () => {
+    axios.post('/api/categories/store', {
+        title: newCategory.value
+    })
+}
 
-    const deleteCategory = (id) => {
-        axios.delete('/api/categories/' + id)
-            .then((res) => {
-                if (id == currentCategoryId.value) {
-                    flagger.flag = !flagger.flag
-                }
-                getCategories()
-        })
-        // console.log(window.history.back())
-    }
+const getCurrentCategoryId = () => {
 
-    onMounted(() => {
-        getCurrentCategoryId()
-        getCategories()
+// window.location.href returns the href (URL) of the current page ·
+    // currentUrl = ref(window.location.href)
+    currentUrl = ref(window.location.href)
+    currentCategoryId = ref(currentUrl.value.replace('http://localhost:8000/categories/', ''))
+}
+
+const addCategory = async () => {
+    submitNewCategory()
+    getCategories()
+    newCategory.value = ''
+    flagger.flag = !flagger.flag
+}
+
+const getCategories = async () => {
+    axios.get('/api/categories')
+        .then((res) => {
+        categories.value = res.data
         console.log(categories.value)
     })
+}
 
-    watch(route, () => {
-        getCurrentCategoryId()
+const deleteCategory = (id) => {
+    if (categories.value.length === 1) {
+        dataSense.flag = !dataSense.flag
+        console.log(dataSense.flag)
+    }
+    axios.delete('/api/categories/' + id)
+        .then(() => {
+            if (id == currentCategoryId.value) {
+                flagger.flag = !flagger.flag
+            }
+            getCategories()
     })
+}
 
+onMounted(() => {
+    getCurrentCategoryId()
+    getCategories()
 
+})
+
+watch(route, () => {
+    getCurrentCategoryId()
+})
 </script>
 
 <template>
     <div class="form-box">
         <h4 style="margin-bottom: 20px; margin-top: 10px">RECIPE HOUSE</h4>
-        <!-- <form method="post" action="{{ route('categories.store') }}">
-            @csrf
-            <p class="control has-icons-left has-icons-right">
-                    <input class="input title-input" type="text" name="title" placeholder="enter category name">
-                    <span class="icon is-small is-left">
-                        <i class="fas fa-utensils"></i>
-                    </span>
-            </p>
-        </form> -->
         <form method="post" v-on:submit.prevent="addCategory">
             <input type="text" v-model="newCategory">
+            <!-- <input type="text" v-model="newCategory" v-on:keydown.enter="$router.push({ path: '/'})"> -->
         </form>
     </div>
     <ul class="category_ul">
