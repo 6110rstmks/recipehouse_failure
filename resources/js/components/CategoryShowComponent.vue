@@ -26,16 +26,21 @@ const noData = ref(false)
 let categoryId = parseInt(route.params.categoryId)
 
 const addRecipe = () => {
+
     submitNewRecipe()
     getRecipes()
     newRecipe.value = ''
 }
 
 const getCategory = async () => {
-    axios.get('/api/categories/' + categoryId)
-        .then((res) => {
-            category.value = res.data
-        })
+    try {
+        const res = await axios.get('/api/categories/' + categoryId)
+        console.log(res.data)
+        category.value = res.data
+    } catch(err) {
+        noData.value = !noData.value
+    }
+
 }
 
 const getMaxIdCategory = () => {
@@ -77,8 +82,9 @@ flagger.$subscribe((mutation,state) => {
     getMaxIdCategory()
 })
 
+// 残り一つのカテゴリが削除されたのを感知する
 dataSense.$subscribe((mutation, state) => {
-    noData.value = true
+    noData.value = !noData.value
 })
 
 </script>
@@ -87,13 +93,16 @@ dataSense.$subscribe((mutation, state) => {
     <span class="icon">
         <i class="fas fa-utensils fa-lg"></i>
     </span>
-    <div>{{ category.title }}</div>
-    <form method="post" v-on:submit.prevent="addRecipe">
-        <input type="text" v-model="newRecipe">
-    </form>
+    <div v-if="noData">No Category</div>
+    <div v-if="!noData">
+        <span>{{ category.title }}</span>
+        <form method="post" v-on:submit.prevent="addRecipe">
+            <input type="text" v-model="newRecipe">
+        </form>
+    </div>
 
-    <li v-if="noData">No data</li>
-    <ul style="margin-top: 15px;" v-if="!noData">
+
+    <ul style="margin-top: 15px;">
         <li v-for="recipe in recipes">{{ recipe.title }}</li>
     </ul>
 </template>

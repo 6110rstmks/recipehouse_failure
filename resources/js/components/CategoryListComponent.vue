@@ -35,6 +35,10 @@ const getCurrentCategoryId = () => {
 }
 
 const addCategory = async () => {
+    if (categories.value.length === 0)
+    {
+        dataSense.flag = !dataSense.flag
+    }
     submitNewCategory()
     getCategories()
     newCategory.value = ''

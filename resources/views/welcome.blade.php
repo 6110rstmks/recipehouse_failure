@@ -13,23 +13,11 @@
         <div id="app">
             <div class="container">
                 <div class="left-container">
-                    {{-- <div class="form-box">
-                        <h4 style="margin-bottom: 20px; margin-top: 10px">RECIPE HOUSE</h4>
-                        <form method="post" action="{{ route('categories.store') }}">
-                            @csrf
-                            <p class="control has-icons-left has-icons-right">
-                                    <input class="input title-input" type="text" name="title" placeholder="enter category name">
-                                    <span class="icon is-small is-left">
-                                        <i class="fas fa-utensils"></i>
-                                    </span>
-                            </p>
-                        </form>
-                    </div> --}}
                     <category-list></category-list>
                 </div>
                 <div class="right-container">
-                    <router-view name="Max"></router-view>
-                    <router-view></router-view>
+                    <router-view name="Home"></router-view>
+                    <router-view name="Show"></router-view>
                 </div>
             </div>
         </div>

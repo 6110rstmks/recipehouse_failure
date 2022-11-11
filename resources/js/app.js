@@ -5,22 +5,23 @@ import { createPinia } from 'pinia'
 
 import CategoryListComponent from './components/CategoryListComponent.vue'
 import CategoryShowComponent from './components/CategoryShowComponent.vue'
-import CategoryMaxComponent from './components/CategoryMaxComponent.vue'
+import CategoryShowHomeComponent from './components/CategoryShowHomeComponent.vue'
 
 
 const routes = [
     {
-        // path: '/categories',
         path: '/',
         name: 'category.list',
         components: {
-            Max: CategoryMaxComponent
+            Home: CategoryShowHomeComponent
         }
     },
     {
         path: '/categories/:categoryId',
         name: 'category.show',
-        component: CategoryShowComponent,
+        components: {
+            Show: CategoryShowComponent
+        },
         props: true
     },
 ]

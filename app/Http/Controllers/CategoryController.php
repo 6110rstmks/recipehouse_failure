@@ -11,14 +11,12 @@ class CategoryController extends Controller
 {
     public function index()
     {
-
-        // Log::debug(Category::all());
-        // Log::debug(Category::latest()->get());
         return Category::latest()->get();
     }
 
     public function show(Category $category)
     {
+        Log::debug($category);
         return $category;
     }
 
@@ -26,11 +24,8 @@ class CategoryController extends Controller
     {
         $maxId = Category::max('id');
 
-        // Log::debug(Category::where('id', '=', $maxId)->get()->toArray());
+        Log::debug(Category::find(Category::max('id')));
 
-        // Log::debug(Category::find(Category::max('id')));
-
-        // return Category::where('id', '=', $maxId)->get();
         return Category::find(Category::max('id'));
     }
 
