@@ -20,6 +20,7 @@ let currentCategoryId = ref('')
 
 let currentUrl = ref('')
 
+
 const submitNewCategory = () => {
     axios.post('/api/categories/store', {
         title: newCategory.value
@@ -49,22 +50,32 @@ const getCategories = async () => {
     axios.get('/api/categories')
         .then((res) => {
         categories.value = res.data
-        console.log(categories.value)
     })
 }
 
-const deleteCategory = (id) => {
+const deleteCategory = async (id) => {
+    //　(CategoryShow用のバグ処理)
+    //  カテゴリが一件しかない状態でそれを削除したら
+    //  CategoryShowComponentでNo Categoryと表示させる
     if (categories.value.length === 1) {
         dataSense.flag = !dataSense.flag
-        console.log(dataSense.flag)
     }
-    axios.delete('/api/categories/' + id)
-        .then(() => {
-            if (id == currentCategoryId.value) {
-                flagger.flag = !flagger.flag
-            }
-            getCategories()
-    })
+
+    // 最大idカテゴリが削除されたら
+    // 改めてそれよりidが小さいカテゴリの中で最大のカテゴリを取得する
+    // (CategoryShowHome(デフォルトページ)用のバグ処理)
+    const res = await axios.get('/api/max')
+    let MaxCategoryId = res.data.id
+    if (MaxCategoryId === id)
+    {
+        flagger.flag = !flagger.flag
+    }
+
+    await axios.delete('/api/categories/' + id)
+    if (id == currentCategoryId.value) {
+        flagger.flag = !flagger.flag
+    }
+    getCategories()
 }
 
 onMounted(() => {

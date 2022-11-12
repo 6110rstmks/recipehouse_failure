@@ -5,6 +5,7 @@ import { ref, onMounted } from "vue"
 import { useStoreFlagger } from '../stores/flagger.js'
 import { useDataSense } from '../stores/dataSense.js'
 
+// import {} from '../../function.js'
 
 const flagger = useStoreFlagger()
 const dataSense = useDataSense()
@@ -41,11 +42,18 @@ const getRecipes = () => {
 const getMaxIdCategory = async () => {
     const maxRes = await axios.get('/api/max')
     category.value = maxRes.data
+
+    if (maxRes.data === '')
+    {
+        return
+    }
 }
 
 const onMountedGetRecipes = async () => {
     const maxRes = await axios.get('/api/max')
-    // カテゴリが一つもない場合
+
+    // リロード時点でカテゴリが一つもない場合
+
     if (maxRes.data === '')
     {
         return
@@ -61,8 +69,12 @@ onMounted(() => {
     onMountedGetRecipes()
 })
 
+// 
 flagger.$subscribe((mutation,state) => {
     getMaxIdCategory()
+        .then((data) => {
+            getRecipes()
+        })
 })
 
 dataSense.$subscribe((mutation, state) => {
@@ -82,11 +94,8 @@ dataSense.$subscribe((mutation, state) => {
         <form method="post" v-on:submit.prevent="addRecipe">
             <input type="text" v-model="newRecipe">
         </form>
+        <ul style="margin-top: 15px;">
+            <li v-for="recipe in recipes">{{ recipe.title }}</li>
+        </ul>
     </div>
-
-    <ul style="margin-top: 15px;">
-        <li v-for="recipe in recipes">{{ recipe.title }}</li>
-    </ul>
-
-
 </template>

@@ -21,6 +21,3 @@ Route::get('/', function () {
 Route::get('{any?}', function () {
     return view('welcome');
 })->where('any', '.*');
-
-// Route::post('/categories/store', [CategoryController::class, 'store'])
-//     ->name('categories.store');
