@@ -1,3 +1,5 @@
+{{-- // localで確認するときは、php artisan serve とnpm run devを実行してください
+// 久しぶりに確認するときは忘れがち。 --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

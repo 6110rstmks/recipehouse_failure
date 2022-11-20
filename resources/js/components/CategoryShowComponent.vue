@@ -35,7 +35,7 @@ const addRecipe = () => {
 const getCategory = async () => {
     try {
         const res = await axios.get('/api/categories/' + categoryId)
-        console.log(res.data)
+        // console.log(res.data)
         category.value = res.data
     } catch(err) {
 

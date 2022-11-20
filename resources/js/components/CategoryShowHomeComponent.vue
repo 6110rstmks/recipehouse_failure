@@ -5,6 +5,7 @@ import { ref, onMounted } from "vue"
 import { useStoreFlagger } from '../stores/flagger.js'
 import { useDataSense } from '../stores/dataSense.js'
 
+// 外部から自作関数呼び出し
 // import {} from '../../function.js'
 
 const flagger = useStoreFlagger()
@@ -34,7 +35,7 @@ const getRecipes = () => {
 
     axios.get('/api/categories/' + categoryId + '/recipes/')
         .then((res) => {
-            console.log(res.data)
+            // console.log(res.data)
             recipes.value = res.data
     })
 }
@@ -69,7 +70,8 @@ onMounted(() => {
     onMountedGetRecipes()
 })
 
-// 
+// 左ページにおいてidが最大のカテゴリが削除されたら
+// その次にidの大きいカテゴリ及びそれに紐づくレシピを取得
 flagger.$subscribe((mutation,state) => {
     getMaxIdCategory()
         .then((data) => {

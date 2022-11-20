@@ -1,3 +1,5 @@
+<!-- // localで確認するときは、php artisan serve とnpm run devを実行してください
+// 久しぶりに確認するときは忘れがち。 -->
 <script setup>
 import { ref, onMounted, watch } from "vue"
 import { useRoute, useRouter} from 'vue-router'
@@ -94,7 +96,6 @@ watch(route, () => {
         <h4 style="margin-bottom: 20px; margin-top: 10px">RECIPE HOUSE</h4>
         <form method="post" v-on:submit.prevent="addCategory">
             <input type="text" v-model="newCategory">
-            <!-- <input type="text" v-model="newCategory" v-on:keydown.enter="$router.push({ path: '/'})"> -->
         </form>
     </div>
     <ul class="category_ul">
